@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Create HTML Form') {
+            steps {
+                script {
+                    def htmlContent = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Form</title>
+</head>
+<body>
+    <h1>Simple Form</h1>
+    <form action="/submit-form" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+'''
+                    // Create the HTML file in the workspace
+                    writeFile file: 'simple_form.html', text: htmlContent
+                }
+            }
+        }
+        stage('Archive HTML File') {
+            steps {
+                // Archive the generated HTML file as an artifact
+                archiveArtifacts artifacts: 'simple_form.html', fingerprint: true
+            }
+        }
+    }
+    post {
+        always {
+            // Clean up the workspace after the build
+            cleanWs()
+        }
+    }
+}
+
